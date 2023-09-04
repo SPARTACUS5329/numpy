@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "numpy.c"
+#include <stdlib.h>
+#include "numpy.h"
 
 float h(struct Array theta, float x[4]) {
   float sum = 0;
@@ -23,27 +24,18 @@ float diff(int d, int j, struct Array theta, float xi[d + 1]) {
 }
 
 struct Array* gradientDescent(int iter, int m, int d, float alpha, struct Array theta, float data[m][d + 1], float (*diff)()) {
-  struct Array weights;
-  weights.size = d;
-  weights.arr = (float *) malloc(d * sizeof(float));
-  struct Array *arrayPtr = &weights;
+  struct Array *weights = malloc(sizeof(struct Array));
+  weights->size = d;
+  weights->arr = (float *) malloc(d * sizeof(float));
   for (int i = 0; i < iter; i++) {
     for (int j = 0; j < d; j++) {
       for (int k = 0; k < m; k++) {
         theta.arr[j] -= alpha*diff(d, j, theta, data[k]);
-        arrayPtr->arr[j] = theta.arr[j];
+        weights->arr[j] = theta.arr[j];
       }
     }
   }
-  return arrayPtr;
-}
-
-void printArr(struct Array *ptr) {
-  printf("size of ptr: %d\n", ptr->size);
-  for (int i = 0; i < 3; i++) {
-    printf("%f ", (ptr->arr)[i]);
-  }
-  printf("\n");
+  return weights;
 }
 
 int main()
