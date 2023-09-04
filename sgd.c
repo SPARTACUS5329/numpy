@@ -1,66 +1,48 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include "numpy.h"
 
-float h(float theta[3], float x[4]) {
-  float sum = 0.0;
-  for (int i = 0; i < 3; i++) {
-    sum += theta[i]*x[i];
+float h(array_t theta, float x[4]) {
+  float sum = 0;
+  for (int i = 0; i < theta.size; i++) {
+    sum += theta.arr[i]*x[i];
   }
   return sum;
 }
 
-float cost(float theta[3], float data[5][4]) {
+float cost(array_t theta, matrix_t data) {
   float error = 0;
   for (int i = 0; i < 5; i++) {
-    float sum = h(theta, data[i]);
-    error += (sum - data[i][3]) * (sum - data[i][3]);
+    float sum = h(theta, data.matrix[i]);
+    error += (sum - data.matrix[i][3]) * (sum - data.matrix[i][3]);
   }
   return error;
 }
 
-float diff(int d, int j, float theta[d], float xi[d + 1]) {
-  return (h(theta, xi) - xi[d])*xi[j];
-}
-
-float* stochasticGradientDescent(int iter, int batchSize, int m, int d, float alpha, float theta[d], float data[m][d + 1], float (*diff)()) {
-  for (int i = 0; i < iter; i++) {
-    for (int k = 0; k < m; k += batchSize) {
-      for (int b = k; b < k + batchSize; b += 1) {
-        for (int j = 0; j < d; j++) {
-            theta[j] -= alpha*diff(d, j, theta, data[b]);
-        }
-      }
-    }
-  }
-  return theta;
-}
-
-void printArr(float arr[]) {
-  printf("\nPrinting Array: ");
-  int size = sizeof(&arr) / sizeof(&arr[0]);
-  printf("%d", size);
-  for (int i = 0; i < size; i++) {
-    printf("%f ", arr[i]);
-  }
-  printf("\n");
+float diff(int j, array_t theta, float xi[theta.size + 1]) {
+  return (h(theta, xi) - xi[theta.size])*xi[j];
 }
 
 int main()
 {
-  float theta[3] = {0, 0, 0};
-  float alpha = 1e-5;
-  float data[5][4] = {
+  array_t theta;
+  theta.size = 3;
+  theta.arr = (float *) calloc(theta.size, sizeof(float));
+  float alpha = 5e-5;
+  float dataPointer[5][4] = {
     {1, 2, 3, 6},
     {1, 4, 6, 11},
     {1, 9, 10, 20},
     {1, 3, 5, 9},
     {1, 7, 7, 15}
   };
-  float *weights = stochasticGradientDescent(10000, 1, 5, 3, alpha, theta, data, diff);
-  printArr(weights);
-  float res = cost(weights, data);
+  matrix_t *data = new_matrix(5, 4, dataPointer);
+  array_t *weights = stochasticGradientDescent(10000, 1, 5, alpha, theta, *data, diff);
+  print_arr(weights);
+  float res = cost(*weights, *data);
   printf("%f\n", res);
   float test[4]  = {1, 5, 8, 14};
-  float ans = h(weights, test);
+  float ans = h(*weights, test);
   printf("%f", ans);
   return 0;
 }

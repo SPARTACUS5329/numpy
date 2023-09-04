@@ -2,40 +2,93 @@
 #include <stdlib.h>
 #include "numpy.h"
 
-int **product(int rows1, int cols1, int rows2, int cols2, int arr1[rows1][cols1], int arr2[rows2][cols2])
+matrix_t* product(matrix_t mat1, matrix_t mat2)
 {
-    int **prod = (int **)(malloc(rows1 * sizeof(int *)));
-    if (cols1 != rows2)
+    matrix_t *prod = malloc(sizeof(matrix_t));
+    prod->rows = mat1.rows;
+    prod->cols = mat2.cols;
+    if (mat1.cols != mat2.rows)
         return prod;
-    for (int i = 0; i < rows1; i++)
+    prod->matrix = calloc(mat1.rows, sizeof(float *));
+    for (int i = 0; i < mat1.rows; i++)
     {
-        prod[i] = (int *)(malloc(cols2 * sizeof(int)));
+        prod->matrix[i] = malloc(sizeof(float));
     }
-    for (int k = 0; k < cols2; k++)
+    for (int k = 0; k < mat2.cols; k++)
     {
-        for (int i = 0; i < rows1; i++)
+        for (int i = 0; i < mat1.rows; i++)
         {
-            for (int j = 0; j < cols1; j++)
+            for (int j = 0; j < mat1.cols; j++)
             {
-                prod[i][k] += arr1[i][j] * arr2[j][k];
+                prod->matrix[i][k] += mat1.matrix[i][j] * mat2.matrix[j][k];
             }
         }
     }
     return prod;
 }
 
-void printArr(struct Array *ptr) {
-  printf("size of ptr: %d\n", ptr->size);
+matrix_t *new_matrix(size_t rows, size_t cols, float grid[rows][cols]) {
+    matrix_t *matrix = malloc(sizeof(matrix_t));
+    matrix->rows = rows;
+    matrix->cols = cols;
+    matrix->matrix = calloc(rows, sizeof(float *));
+    for (int i = 0; i < rows; i++) {
+        matrix->matrix[i] = malloc(sizeof(float));
+    }
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            matrix->matrix[i][j] = grid[i][j];
+        }
+    }
+    return matrix;
+}
+
+array_t* gradientDescent(int iter, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
+  int d = theta.size;
+  array_t *weights = malloc(sizeof(array_t));
+  weights->size = d;
+  weights->arr = (float *) malloc(d * sizeof(float));
+  for (int i = 0; i < iter; i++) {
+    for (int j = 0; j < d; j++) {
+      for (int k = 0; k < m; k++) {
+        theta.arr[j] -= alpha*diff(j, theta, data.matrix[k]);
+        weights->arr[j] = theta.arr[j];
+      }
+    }
+  }
+  return weights;
+}
+
+array_t* stochasticGradientDescent(int iter, int batchSize, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
+  int d = theta.size;
+  array_t *weights = malloc(sizeof(array_t));
+  weights->size = d;
+  weights->arr = (float *) malloc(d * sizeof(float));
+  for (int i = 0; i < iter; i++) {
+    for (int k = 0; k < m; k += batchSize) {
+      for (int b = k; b < k + batchSize; b++) {
+        for (int j = 0; j < d; j++) {
+          theta.arr[j] -= alpha*diff(j, theta, data.matrix[b]);
+          weights->arr[j] = theta.arr[j];
+        }
+      }
+    }
+  }
+  return weights;
+}
+
+void print_arr(array_t *ptr) {
   for (int i = 0; i < 3; i++) {
     printf("%f ", (ptr->arr)[i]);
   }
   printf("\n");
 }
 
-void printMatrix(int rows, int cols, int arr[rows][cols]) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j > cols; j++) {
-            printf("%d", arr[i][j]);
+void print_matrix(matrix_t matrix) {
+    for (int i = 0; i < matrix.rows; i++) {
+        for (int j = 0; j < matrix.cols; j++) {
+            printf("%f ", matrix.matrix[i][j]);
         }
+        printf("\n");
     }
 }
