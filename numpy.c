@@ -27,6 +27,13 @@ matrix_t* product(matrix_t mat1, matrix_t mat2)
     return prod;
 }
 
+array_t* new_array(int size) {
+  array_t *newArr = malloc(sizeof(array_t));
+  newArr->size = size;
+  newArr->arr = calloc(newArr->size, sizeof(float));
+  return newArr;
+}
+
 matrix_t *new_matrix(size_t rows, size_t cols, float grid[rows][cols]) {
     matrix_t *matrix = malloc(sizeof(matrix_t));
     matrix->rows = rows;
@@ -77,8 +84,26 @@ array_t* stochasticGradientDescent(int iter, int batchSize, int m, float alpha, 
   return weights;
 }
 
+array_t* slice(array_t array, int start, int stop, int step) {
+  int size = (stop - start)/step;
+  array_t *slicedArray = new_array(size);
+  int k = 0;
+  for (int i = start; i < stop; i += step) {
+    slicedArray->arr[k] = array.arr[i];
+    k += 1;
+  }
+  return slicedArray;
+}
+
+int* shape(matrix_t matrix) {
+  int *ptr = malloc(sizeof(int));
+  ptr[0] = matrix.rows;
+  ptr[1] = matrix.cols;
+  return ptr;
+}
+
 void print_arr(array_t *ptr) {
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < ptr->size; i++) {
     printf("%f ", (ptr->arr)[i]);
   }
   printf("\n");

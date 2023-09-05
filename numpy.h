@@ -12,8 +12,11 @@ typedef struct Matrix {
 } matrix_t;
 
 void print_arr(array_t*);
-matrix_t* new_matrix(size_t rows, size_t cols, float grid[rows][cols]);
 void print_matrix(matrix_t);
+int* shape(matrix_t);
+array_t* new_array(int);
+matrix_t* new_matrix(size_t rows, size_t cols, float grid[rows][cols]);
+array_t* slice(array_t, int, int, int);
 matrix_t* product(matrix_t, matrix_t);
 array_t* gradientDescent(int, int, float, array_t, matrix_t, float (*)());
 array_t* stochasticGradientDescent(int, int, int, float, array_t, matrix_t, float (*)());

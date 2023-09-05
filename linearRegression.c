@@ -25,9 +25,7 @@ float diff(int j, array_t theta, float xi[theta.size + 1]) {
 
 int main()
 {
-  array_t theta;
-  theta.size = 3;
-  theta.arr = (float *) calloc(theta.size, sizeof(float));
+  array_t *theta = new_array(3);
   float alpha = 5e-5;
   float dataPointer[5][4] = {
     {1, 2, 3, 6},
@@ -36,13 +34,15 @@ int main()
     {1, 3, 5, 9},
     {1, 7, 7, 15}
   };
+
   matrix_t *data = new_matrix(5, 4, dataPointer);
-  array_t *weights = gradientDescent(1000000, 5, alpha, theta, *data, diff);
+  array_t *weights = gradientDescent(1000000, 5, alpha, *theta, *data, diff);
+  printf("Weights: ");
   print_arr(weights);
   float res = cost(*weights, *data);
-  printf("%f\n", res);
+  printf("Cost: %f\n", res);
   float test[4]  = {1, 5, 8, 14};
   float ans = h(*weights, test);
-  printf("%f", ans);
+  printf("Prediction: %f", ans);
   return 0;
 }
