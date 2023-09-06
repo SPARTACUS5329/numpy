@@ -50,7 +50,7 @@ matrix_t *new_matrix(size_t rows, size_t cols, float grid[rows][cols]) {
     return matrix;
 }
 
-array_t* gradientDescent(int iter, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
+array_t* gradient_descent(int iter, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
   int d = theta.size;
   array_t *weights = malloc(sizeof(array_t));
   weights->size = d;
@@ -66,7 +66,7 @@ array_t* gradientDescent(int iter, int m, float alpha, array_t theta, matrix_t d
   return weights;
 }
 
-array_t* stochasticGradientDescent(int iter, int batchSize, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
+array_t* stochastic_gradient_descent(int iter, int batchSize, int m, float alpha, array_t theta, matrix_t data, float (*diff)()) {
   int d = theta.size;
   array_t *weights = malloc(sizeof(array_t));
   weights->size = d;
@@ -82,6 +82,20 @@ array_t* stochasticGradientDescent(int iter, int batchSize, int m, float alpha, 
     }
   }
   return weights;
+}
+
+array_t* copy(array_t array) {
+  array_t *copyArray = new_array(array.size);
+  for (int i = 0; i < array.size; i++) {
+    copyArray->arr[i] = array.arr[i];
+  }
+  return copyArray;
+}
+
+array_t* view(array_t array) {
+  array_t *viewArray = new_array(array.size);
+  viewArray->arr = array.arr;
+  return viewArray;
 }
 
 array_t* slice(array_t array, int start, int stop, int step) {
