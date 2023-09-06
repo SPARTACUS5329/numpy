@@ -15,6 +15,7 @@ void print_arr(array_t*);
 void print_matrix(matrix_t);
 int* shape(matrix_t);
 array_t* new_array(int);
+array_t* arange(float, float, float);
 matrix_t* new_matrix(size_t rows, size_t cols, float grid[rows][cols]);
 array_t* copy(array_t);
 array_t* view(array_t);

@@ -34,6 +34,19 @@ array_t* new_array(int size) {
   return newArr;
 }
 
+array_t* arange(float start, float stop, float step) {
+  array_t *newArr = malloc(sizeof(array_t));
+  int size = (stop - start) / step;
+  newArr->size = size;
+  newArr->arr = calloc(newArr->size, sizeof(float));
+  float curr = start;
+  for (int i = 0; i < size; i++) {
+    newArr->arr[i] = curr;
+    curr += step;
+  }
+  return newArr;
+}
+
 matrix_t *new_matrix(size_t rows, size_t cols, float grid[rows][cols]) {
     matrix_t *matrix = malloc(sizeof(matrix_t));
     matrix->rows = rows;
